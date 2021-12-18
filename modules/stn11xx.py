@@ -1,8 +1,9 @@
 import logging
-import parsing
+#import parsing
 import re
 import salt.exceptions
 
+from utils import parsing
 from messaging import EventDrivenMessageClient, msg_pack as _msg_pack
 from timeit import default_timer as timer
 
