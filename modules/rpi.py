@@ -10,6 +10,7 @@
 #######################################################################################################################################
 
 import os
+import subprocess
 import csv
 import time
 
@@ -94,7 +95,9 @@ def boot_time():
     ret = {"value": None}
 
     #res = __salt__["cmd.shell"]("grep 'Booting Linux' /var/log/syslog | tail -1")
-    res = os.popen("grep 'Booting Linux' /var/log/syslog | tail -1").readlines()
+    #res = os.popen("grep 'Booting Linux' /var/log/syslog | tail -1").readlines()
+    #res = os.popen("cat /var/log/syslog | grep 'Booting Linux'").readlines()
+    res = subprocess.check_output("cat /var/log/syslog | grep 'Booting Linux'", shell=True)
     if not res:
         return ret
 

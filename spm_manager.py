@@ -271,9 +271,9 @@ if __name__ == '__main__':
 
     while True:
 
-        print("heartbeat")
+        #print("heartbeat")
         heartbeat_handler()
-        log.warning("Heartbeat")
+        #log.warning("Heartbeat")
     #    conn.status()
     #    conn.stats()
     #    conn.timer()
