@@ -172,3 +172,6 @@ def get_volt():
         
 #    time.sleep(delay)
 #    elapsed += delay
+
+if __name__ == '__main__':
+    boot_time()
