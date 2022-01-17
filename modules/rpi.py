@@ -97,7 +97,11 @@ def boot_time():
     #res = __salt__["cmd.shell"]("grep 'Booting Linux' /var/log/syslog | tail -1")
     #res = os.popen("grep 'Booting Linux' /var/log/syslog | tail -1").readlines()
     #res = os.popen("cat /var/log/syslog | grep 'Booting Linux'").readlines()
-    res = subprocess.check_output("cat /var/log/syslog | grep 'Booting Linux'", shell=True)
+    #res = subprocess.check_output("cat /var/log/syslog | grep 'Booting Linux'", shell=True)
+    p1 = subprocess.Popen(["cat", "/var/log/syslog"], stdout=subprocess.PIPE)
+    p2 = subprocess.Popen(["grep", "Booting Linux"], stdin=p1.stdout, stdout=subprocess.PIPE)
+    p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
+    res = p2.communicate()[0].decode(encoding="UTF8")
     if not res:
         return ret
 
