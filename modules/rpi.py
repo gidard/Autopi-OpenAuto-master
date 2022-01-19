@@ -9,6 +9,7 @@
 # https://github.com/autopi-io                                                                                                        #
 #######################################################################################################################################
 
+from asyncio.subprocess import STDOUT
 import os
 import subprocess
 import csv
@@ -23,7 +24,8 @@ import re
 log = logging.getLogger(__name__)
 
 _gpu_temp_regex = re.compile("^temp=(?P<value>[-+]?[0-9]*\.?[0-9]*)'(?P<unit>.+)$")
-_linux_boot_log_regex = re.compile("^(?P<timestamp>.+) raspberrypi kernel: .+$")
+#_linux_boot_log_regex = re.compile("^(?P<timestamp>.+) raspberrypi kernel: .+$")
+_linux_boot_log_regex = re.compile(r'^(?P<timestamp>.+) raspberrypi $')
 
 delay = 10
 csv_file = "pi_soc_results.csv"
@@ -97,15 +99,26 @@ def boot_time():
     #res = __salt__["cmd.shell"]("grep 'Booting Linux' /var/log/syslog | tail -1")
     #res = os.popen("grep 'Booting Linux' /var/log/syslog | tail -1").readlines()
     #res = os.popen("cat /var/log/syslog | grep 'Booting Linux'").readlines()
-    #res = subprocess.check_output("cat /var/log/syslog | grep 'Booting Linux'", shell=True)
-    p1 = subprocess.Popen(["cat", "/var/log/syslog"], stdout=subprocess.PIPE)
-    p2 = subprocess.Popen(["grep", "Booting Linux"], stdin=p1.stdout, stdout=subprocess.PIPE)
+    """
+    try:
+        res = subprocess.check_output("cat /var/log/syslog | grep 'Booting Linux'", shell=True, text=True, stderr=STDOUT)
+    except subprocess.CalledProcessError as e:
+        print(e.returncode)
+        print(e.cmd)
+        print(e.output)
+        return ret
+    """
+
+    #p1 = subprocess.Popen(["cat", "/var/log/syslog"], stdout=subprocess.PIPE)
+    p1 = subprocess.Popen(["grep", "Booting Linux", "/var/log/syslog"], stdout=subprocess.PIPE)
+    #p2 = subprocess.Popen(["grep", "Booting Linux"], stdin=p1.stdout, stdout=subprocess.PIPE)
+    p2 = subprocess.Popen(["tail", "-1"], stdin=p1.stdout, stdout=subprocess.PIPE)
     p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
     res = p2.communicate()[0].decode(encoding="UTF8")
     if not res:
         return ret
 
-    match = _linux_boot_log_regex.match(res[0])
+    match = _linux_boot_log_regex.match(res)
     if not match:
         raise ValueError("Unable to parse log line: {:}".format(res)) #salt.exceptions.CommandExecutionError("Unable to parse log line: {:}".format(res))
 
