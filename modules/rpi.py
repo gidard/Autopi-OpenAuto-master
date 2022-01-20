@@ -25,7 +25,7 @@ log = logging.getLogger(__name__)
 
 _gpu_temp_regex = re.compile("^temp=(?P<value>[-+]?[0-9]*\.?[0-9]*)'(?P<unit>.+)$")
 #_linux_boot_log_regex = re.compile("^(?P<timestamp>.+) raspberrypi kernel: .+$")
-_linux_boot_log_regex = re.compile(r'^(?P<timestamp>.+) raspberrypi $')
+_linux_boot_log_regex = re.compile(r'^(?P<timestamp>.{15})')
 
 delay = 10
 csv_file = "pi_soc_results.csv"
